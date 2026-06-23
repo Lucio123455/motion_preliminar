@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,23 +6,27 @@ import {
   ActivityIndicator,
   FlatList,
   TouchableOpacity,
-  Modal,
-  SafeAreaView,
 } from "react-native";
 import { routinesService, Routine } from "../services/routines";
+import CreateRoutineModal from "../components/CreateRoutineModal";
+
+const HARDCODED_USER_ID = 1;
 
 export default function RoutinesScreen() {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
+  const fetchRoutines = useCallback(() => {
+    setLoading(true);
     routinesService
-      .list()
+      .list(HARDCODED_USER_ID)
       .then(setRoutines)
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => { fetchRoutines(); }, [fetchRoutines]);
 
   return (
     <View style={styles.container}>
@@ -38,7 +42,10 @@ export default function RoutinesScreen() {
           }
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <Text style={styles.cardName}>{item.name}</Text>
+              <View style={styles.cardRow}>
+                <Text style={styles.cardName}>{item.name}</Text>
+                {item.principal && <Text style={styles.badge}>Principal</Text>}
+              </View>
               {item.description && (
                 <Text style={styles.cardDesc}>{item.description}</Text>
               )}
@@ -47,61 +54,44 @@ export default function RoutinesScreen() {
         />
       )}
 
-      {/* FAB */}
       <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)} activeOpacity={0.8}>
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
 
-      {/* Modal */}
-      <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalSheet}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Modal rutina</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Text style={styles.modalClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <CreateRoutineModal
+        visible={modalVisible}
+        userId={HARDCODED_USER_ID}
+        onClose={() => setModalVisible(false)}
+        onCreated={() => { setModalVisible(false); fetchRoutines(); }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0f172a",
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  empty: {
-    color: "#64748b",
-    fontSize: 16,
-    textAlign: "center",
-    lineHeight: 26,
-  },
+  container: { flex: 1, backgroundColor: "#0f172a" },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
+  empty: { color: "#64748b", fontSize: 16, textAlign: "center", lineHeight: 26 },
   card: {
     backgroundColor: "#1e293b",
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 14,
     padding: 16,
+    gap: 4,
   },
-  cardName: {
-    color: "#f8fafc",
-    fontSize: 16,
-    fontWeight: "600",
+  cardRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  cardName: { color: "#f8fafc", fontSize: 16, fontWeight: "600", flex: 1 },
+  badge: {
+    backgroundColor: "#1d4ed8",
+    color: "#93c5fd",
+    fontSize: 11,
+    fontWeight: "700",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 20,
   },
-  cardDesc: {
-    color: "#94a3b8",
-    fontSize: 14,
-    marginTop: 4,
-  },
+  cardDesc: { color: "#94a3b8", fontSize: 14 },
   fab: {
     position: "absolute",
     bottom: 28,
@@ -118,36 +108,5 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 8,
   },
-  fabIcon: {
-    color: "#fff",
-    fontSize: 28,
-    lineHeight: 32,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "flex-end",
-  },
-  modalSheet: {
-    backgroundColor: "#1e293b",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 24,
-    minHeight: 200,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  modalTitle: {
-    color: "#f8fafc",
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  modalClose: {
-    color: "#64748b",
-    fontSize: 20,
-    padding: 4,
-  },
+  fabIcon: { color: "#fff", fontSize: 28, lineHeight: 32 },
 });
