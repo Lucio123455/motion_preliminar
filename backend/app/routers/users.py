@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -5,6 +6,11 @@ from app.schemas.user import UserCreate, UserUpdate, UserResponse
 import app.crud.users as crud
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+@router.get("/", response_model=List[UserResponse])
+def list_users(db: Session = Depends(get_db)):
+    return crud.list_users(db)
 
 
 @router.get("/{user_id}", response_model=UserResponse)

@@ -1,7 +1,11 @@
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
+
+
+def list_users(db: Session) -> List[User]:
+    return db.query(User).all()
 
 
 def create_user(db: Session, data: UserCreate) -> User:
