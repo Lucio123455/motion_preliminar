@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text } from "react-native";
-import HomeScreen from "../screens/HomeScreen";
+import HomeStack from "./HomeStack";
 import SettingsScreen from "../screens/SettingsScreen";
 
 const Tab = createBottomTabNavigator();
@@ -38,7 +38,7 @@ export default function AppNavigator() {
           tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
         })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Home" component={HomeStack} />
         <Tab.Screen name="Configuración" component={SettingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>

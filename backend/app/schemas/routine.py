@@ -27,19 +27,24 @@ class DayExerciseResponse(BaseModel):
 
 
 class RoutineCreate(BaseModel):
+    user_id: int
     name: str
     description: Optional[str] = None
+    principal: bool = False
 
 
 class RoutineUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    principal: Optional[bool] = None
 
 
 class RoutineResponse(BaseModel):
     id: int
+    user_id: int
     name: str
     description: Optional[str]
+    principal: bool
     model_config = _cfg
 
 

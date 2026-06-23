@@ -7,18 +7,24 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { usersService, User } from "../services/users";
+import { HomeStackParamList } from "../navigation/HomeStack";
 
 const HARDCODED_USER_ID = 1;
 
+type NavProp = NativeStackNavigationProp<HomeStackParamList, "HomeScreen">;
+
 const MENU_ITEMS = [
-  { label: "Mis Rutinas", icon: "📋" },
-  { label: "Mis Ejercicios", icon: "🏋️" },
-  { label: "Mi Progreso", icon: "📈" },
-  { label: "Historial", icon: "📅" },
+  { label: "Mis Rutinas", icon: "📋", screen: "Routines" as const },
+  { label: "Mis Ejercicios", icon: "🏋️", screen: null },
+  { label: "Mi Progreso", icon: "📈", screen: null },
+  { label: "Historial", icon: "📅", screen: null },
 ];
 
 export default function HomeScreen() {
+  const navigation = useNavigation<NavProp>();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +60,12 @@ export default function HomeScreen() {
 
       <View style={styles.grid}>
         {MENU_ITEMS.map((item) => (
-          <TouchableOpacity key={item.label} style={styles.card} activeOpacity={0.7}>
+          <TouchableOpacity
+            key={item.label}
+            style={styles.card}
+            activeOpacity={item.screen ? 0.7 : 1}
+            onPress={() => item.screen && navigation.navigate(item.screen)}
+          >
             <Text style={styles.cardIcon}>{item.icon}</Text>
             <Text style={styles.cardLabel}>{item.label}</Text>
           </TouchableOpacity>
