@@ -7,4 +7,5 @@ export interface User {
 
 export const usersService = {
   getById: (id: number) => api.get<User>(`/users/${id}`),
+  update: (id: number, name: string) => api.put<User>(`/users/${id}`, { name }),
 };
