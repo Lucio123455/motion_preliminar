@@ -4,35 +4,44 @@ from pydantic import BaseModel
 _cfg = {"from_attributes": True}
 
 
-# --- Exercise (standalone) ---
-
-class ExerciseCreate(BaseModel):
-    name: str
+class DayExerciseAdd(BaseModel):
+    exercise_id: int
     sets: int
     reps: int
-    rest_seconds: Optional[int] = None
-    notes: Optional[str] = None
+    exercise_order: int = 1
 
 
-class ExerciseUpdate(BaseModel):
-    name: Optional[str] = None
+class DayExerciseUpdate(BaseModel):
     sets: Optional[int] = None
     reps: Optional[int] = None
-    rest_seconds: Optional[int] = None
-    notes: Optional[str] = None
+    exercise_order: Optional[int] = None
 
 
-class ExerciseResponse(BaseModel):
+class DayExerciseResponse(BaseModel):
     id: int
-    name: str
+    exercise_id: int
     sets: int
     reps: int
-    rest_seconds: Optional[int]
-    notes: Optional[str]
+    exercise_order: int
     model_config = _cfg
 
 
-# --- Day ---
+class RoutineCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+
+class RoutineUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+
+class RoutineResponse(BaseModel):
+    id: int
+    name: str
+    description: Optional[str]
+    model_config = _cfg
+
 
 class DayCreate(BaseModel):
     name: str
@@ -49,24 +58,5 @@ class DayResponse(BaseModel):
     routine_id: int
     name: str
     day_order: int
-    exercises: List[ExerciseResponse] = []
-    model_config = _cfg
-
-
-# --- Routine ---
-
-class RoutineCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
-
-
-class RoutineUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-
-
-class RoutineResponse(BaseModel):
-    id: int
-    name: str
-    description: Optional[str]
+    day_exercises: List[DayExerciseResponse] = []
     model_config = _cfg

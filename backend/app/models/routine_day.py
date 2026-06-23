@@ -12,5 +12,4 @@ class RoutineDay(Base):
     day_order = Column(Integer, nullable=False, default=1)
 
     routine = relationship("Routine", back_populates="days")
-    exercise_links = relationship("DayExerciseLink", back_populates="day", cascade="all, delete-orphan")
-    exercises = relationship("RoutineExercise", secondary="day_exercise_links", viewonly=True)
+    day_exercises = relationship("DayExercise", back_populates="day", cascade="all, delete-orphan")

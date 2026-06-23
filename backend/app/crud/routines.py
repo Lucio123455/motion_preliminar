@@ -2,9 +2,8 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.models.routine import Routine
 from app.models.routine_day import RoutineDay
-from app.models.routine_exercise import RoutineExercise
-from app.models.day_exercise_link import DayExerciseLink
-from app.schemas.routine import RoutineCreate, RoutineUpdate, DayCreate, DayUpdate, ExerciseCreate, ExerciseUpdate
+from app.models.day_exercise import DayExercise
+from app.schemas.routine import RoutineCreate, RoutineUpdate, DayCreate, DayUpdate, DayExerciseAdd, DayExerciseUpdate
 
 
 # --- Routine ---
@@ -75,55 +74,32 @@ def delete_day(db: Session, day_id: int) -> bool:
     return True
 
 
-# --- Exercise (standalone) ---
+# --- DayExercise ---
 
-def get_exercise(db: Session, exercise_id: int) -> Optional[RoutineExercise]:
-    return db.get(RoutineExercise, exercise_id)
+def get_day_exercise(db: Session, day_exercise_id: int) -> Optional[DayExercise]:
+    return db.get(DayExercise, day_exercise_id)
 
-def list_exercises(db: Session) -> List[RoutineExercise]:
-    return db.query(RoutineExercise).all()
-
-def create_exercise(db: Session, data: ExerciseCreate) -> RoutineExercise:
-    exercise = RoutineExercise(**data.model_dump())
-    db.add(exercise)
+def add_exercise_to_day(db: Session, day_id: int, data: DayExerciseAdd) -> DayExercise:
+    entry = DayExercise(day_id=day_id, **data.model_dump())
+    db.add(entry)
     db.commit()
-    db.refresh(exercise)
-    return exercise
+    db.refresh(entry)
+    return entry
 
-def update_exercise(db: Session, exercise_id: int, data: ExerciseUpdate) -> Optional[RoutineExercise]:
-    exercise = db.get(RoutineExercise, exercise_id)
-    if not exercise:
+def update_day_exercise(db: Session, day_exercise_id: int, data: DayExerciseUpdate) -> Optional[DayExercise]:
+    entry = db.get(DayExercise, day_exercise_id)
+    if not entry:
         return None
     for field, value in data.model_dump(exclude_unset=True).items():
-        setattr(exercise, field, value)
+        setattr(entry, field, value)
     db.commit()
-    db.refresh(exercise)
-    return exercise
+    db.refresh(entry)
+    return entry
 
-def delete_exercise(db: Session, exercise_id: int) -> bool:
-    exercise = db.get(RoutineExercise, exercise_id)
-    if not exercise:
+def remove_exercise_from_day(db: Session, day_exercise_id: int) -> bool:
+    entry = db.get(DayExercise, day_exercise_id)
+    if not entry:
         return False
-    db.delete(exercise)
-    db.commit()
-    return True
-
-
-# --- Day ↔ Exercise links ---
-
-def add_exercise_to_day(db: Session, day_id: int, exercise_id: int, exercise_order: int = 1) -> bool:
-    exists = db.query(DayExerciseLink).filter_by(day_id=day_id, exercise_id=exercise_id).first()
-    if exists:
-        return False
-    link = DayExerciseLink(day_id=day_id, exercise_id=exercise_id, exercise_order=exercise_order)
-    db.add(link)
-    db.commit()
-    return True
-
-def remove_exercise_from_day(db: Session, day_id: int, exercise_id: int) -> bool:
-    link = db.query(DayExerciseLink).filter_by(day_id=day_id, exercise_id=exercise_id).first()
-    if not link:
-        return False
-    db.delete(link)
+    db.delete(entry)
     db.commit()
     return True

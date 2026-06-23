@@ -1,9 +1,10 @@
 from app.models.user import User  # noqa: F401
 from app.models.profile import UserProfile  # noqa: F401
 from app.models.exercise import Exercise  # noqa: F401
+from app.models.progress import Progress  # noqa: F401
+from app.models.body_measurement import BodyMeasurement  # noqa: F401
 from app.models.routine import Routine  # noqa: F401
+from app.models.day_exercise import DayExercise  # noqa: F401
 from app.models.routine_day import RoutineDay  # noqa: F401
-from app.models.routine_exercise import RoutineExercise  # noqa: F401
-from app.models.day_exercise_link import DayExerciseLink  # noqa: F401
 from app.models.session import WorkoutSession  # noqa: F401
 from app.models.workout_set import WorkoutSet  # noqa: F401
