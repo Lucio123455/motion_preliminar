@@ -17,9 +17,17 @@ class DayExerciseUpdate(BaseModel):
     exercise_order: Optional[int] = None
 
 
+class ExerciseBasic(BaseModel):
+    id: int
+    name: str
+    muscle_group: Optional[str]
+    model_config = _cfg
+
+
 class DayExerciseResponse(BaseModel):
     id: int
     exercise_id: int
+    exercise: ExerciseBasic
     sets: int
     reps: int
     exercise_order: int

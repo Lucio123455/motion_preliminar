@@ -7,12 +7,18 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { HomeStackParamList } from "../navigation/HomeStack";
 import { routinesService, Routine } from "../services/routines";
 import CreateRoutineModal from "../components/CreateRoutineModal";
+
+type NavProp = NativeStackNavigationProp<HomeStackParamList, "Routines">;
 
 const HARDCODED_USER_ID = 1;
 
 export default function RoutinesScreen() {
+  const navigation = useNavigation<NavProp>();
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -41,7 +47,11 @@ export default function RoutinesScreen() {
             <Text style={styles.empty}>No tenés rutinas aún.{"\n"}Tocá + para crear una.</Text>
           }
           renderItem={({ item }) => (
-            <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate("RoutineDays", { routineId: item.id, routineName: item.name })}
+            >
               <View style={styles.cardRow}>
                 <Text style={styles.cardName}>{item.name}</Text>
                 {item.principal && <Text style={styles.badge}>Principal</Text>}
@@ -49,7 +59,7 @@ export default function RoutinesScreen() {
               {item.description && (
                 <Text style={styles.cardDesc}>{item.description}</Text>
               )}
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
