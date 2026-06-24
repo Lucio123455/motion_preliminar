@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -15,8 +15,12 @@ router = APIRouter(tags=["routines"])
 # --- Routines ---
 
 @router.get("/routines/", response_model=List[RoutineResponse])
-def list_routines(user_id: int, db: Session = Depends(get_db)):
-    return crud.list_routines(db, user_id)
+def list_routines(
+    user_id: Optional[int] = None,
+    principal: Optional[bool] = None,
+    db: Session = Depends(get_db),
+):
+    return crud.list_routines(db, user_id, principal)
 
 @router.get("/routines/{routine_id}", response_model=RoutineResponse)
 def get_routine(routine_id: int, db: Session = Depends(get_db)):

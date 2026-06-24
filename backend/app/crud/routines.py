@@ -11,8 +11,13 @@ from app.schemas.routine import RoutineCreate, RoutineUpdate, DayCreate, DayUpda
 def get_routine(db: Session, routine_id: int) -> Optional[Routine]:
     return db.get(Routine, routine_id)
 
-def list_routines(db: Session, user_id: int) -> List[Routine]:
-    return db.query(Routine).filter(Routine.user_id == user_id).all()
+def list_routines(db: Session, user_id: Optional[int] = None, principal: Optional[bool] = None) -> List[Routine]:
+    q = db.query(Routine)
+    if user_id is not None:
+        q = q.filter(Routine.user_id == user_id)
+    if principal is not None:
+        q = q.filter(Routine.principal == principal)
+    return q.all()
 
 def create_routine(db: Session, data: RoutineCreate) -> Routine:
     routine = Routine(**data.model_dump())
