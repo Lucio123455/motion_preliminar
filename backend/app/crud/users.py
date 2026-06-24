@@ -9,11 +9,15 @@ def list_users(db: Session) -> List[User]:
 
 
 def create_user(db: Session, data: UserCreate) -> User:
-    user = User(name=data.name)
+    user = User(name=data.name, password=data.password)
     db.add(user)
     db.commit()
     db.refresh(user)
     return user
+
+
+def login_user(db: Session, name: str, password: str) -> Optional[User]:
+    return db.query(User).filter(User.name == name, User.password == password).first()
 
 
 def get_user(db: Session, user_id: int) -> Optional[User]:

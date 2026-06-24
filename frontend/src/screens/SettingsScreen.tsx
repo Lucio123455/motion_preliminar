@@ -9,8 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { usersService } from "../services/users";
-
-const HARDCODED_USER_ID = 1;
+import { useAuth } from "../context/AuthContext";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -31,20 +30,22 @@ function SettingRow({ label, value, onPress }: { label: string; value?: string; 
 }
 
 export default function SettingsScreen() {
+  const { userId, logout } = useAuth();
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
   useEffect(() => {
-    usersService.getById(HARDCODED_USER_ID).then((u) => setName(u.name));
-  }, []);
+    if (!userId) return;
+    usersService.getById(userId).then((u) => setName(u.name));
+  }, [userId]);
 
   async function handleSaveName() {
-    if (!name.trim()) return;
+    if (!name.trim() || !userId) return;
     setSaving(true);
     setStatus("idle");
     try {
-      await usersService.update(HARDCODED_USER_ID, name.trim());
+      await usersService.update(userId, name.trim());
       setStatus("success");
     } catch {
       setStatus("error");
@@ -86,6 +87,7 @@ export default function SettingsScreen() {
         <SettingRow label="Notificaciones" value="Activadas" />
         <SettingRow label="Idioma" value="Español" />
         <SettingRow label="Unidad de peso" value="kg" />
+        <SettingRow label="Cerrar sesión" onPress={logout} />
       </Section>
 
       <Section title="App">

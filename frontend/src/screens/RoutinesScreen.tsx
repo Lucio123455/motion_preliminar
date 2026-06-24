@@ -13,13 +13,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "../navigation/HomeStack";
 import { routinesService, Routine } from "../services/routines";
 import CreateRoutineModal from "../components/CreateRoutineModal";
+import { useAuth } from "../context/AuthContext";
 
 type NavProp = NativeStackNavigationProp<HomeStackParamList, "Routines">;
 
-const HARDCODED_USER_ID = 1;
-
 export default function RoutinesScreen() {
   const navigation = useNavigation<NavProp>();
+  const { userId } = useAuth();
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -46,7 +46,7 @@ export default function RoutinesScreen() {
   const fetchRoutines = useCallback(() => {
     setLoading(true);
     routinesService
-      .list(HARDCODED_USER_ID)
+      .list(userId!)
       .then(setRoutines)
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -96,7 +96,7 @@ export default function RoutinesScreen() {
 
       <CreateRoutineModal
         visible={modalVisible}
-        userId={HARDCODED_USER_ID}
+        userId={userId!}
         onClose={() => setModalVisible(false)}
         onCreated={() => { setModalVisible(false); fetchRoutines(); }}
       />

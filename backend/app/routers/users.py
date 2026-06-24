@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.user import UserCreate, UserUpdate, UserResponse
+from app.schemas.user import UserCreate, UserUpdate, UserResponse, UserLogin
 import app.crud.users as crud
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -16,6 +16,14 @@ def list_users(db: Session = Depends(get_db)):
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     user = crud.get_user(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return user
+
+
+@router.post("/login", response_model=UserResponse)
+def login(data: UserLogin, db: Session = Depends(get_db)):
+    user = crud.login_user(db, data.name, data.password)
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return user

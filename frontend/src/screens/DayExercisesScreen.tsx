@@ -16,10 +16,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "../navigation/HomeStack";
 import { routinesService, DayExercise } from "../services/routines";
 import { progressService, todayString } from "../services/progress";
+import { useAuth } from "../context/AuthContext";
 
 type Props = NativeStackScreenProps<HomeStackParamList, "DayExercises">;
-
-const HARDCODED_USER_ID = 1;
 
 type SetRow = {
   weight: string;
@@ -33,6 +32,7 @@ type SetRow = {
 };
 
 export default function DayExercisesScreen({ route }: Props) {
+  const { userId } = useAuth();
   const { routineId, dayId } = route.params;
   const [exercises, setExercises] = useState<DayExercise[]>([]);
   const [lastWeights, setLastWeights] = useState<Record<number, number>>({});
@@ -51,7 +51,7 @@ export default function DayExercisesScreen({ route }: Props) {
         const results = await Promise.all(
           sorted.map((ex) =>
             progressService
-              .getLastWeight(HARDCODED_USER_ID, ex.exercise_id)
+              .getLastWeight(userId!, ex.exercise_id)
               .then((entry) => ({ exerciseId: ex.exercise_id, weight: entry.weight_kg }))
               .catch(() => null)
           )
@@ -78,7 +78,7 @@ export default function DayExercisesScreen({ route }: Props) {
 
     try {
       const existing = await progressService.listByExerciseToday(
-        HARDCODED_USER_ID,
+        userId!,
         exercise.exercise_id
       );
       setSetRows((prev) =>
@@ -123,7 +123,7 @@ export default function DayExercisesScreen({ route }: Props) {
 
     try {
       await progressService.create({
-        user_id: HARDCODED_USER_ID,
+        user_id: userId!,
         exercise_id: selected.exercise_id,
         weight_kg: weightNum,
         reps: repsNum,

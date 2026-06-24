@@ -11,8 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { usersService, User } from "../services/users";
 import { HomeStackParamList } from "../navigation/HomeStack";
-
-const HARDCODED_USER_ID = 1;
+import { useAuth } from "../context/AuthContext";
 
 type NavProp = NativeStackNavigationProp<HomeStackParamList, "HomeScreen">;
 
@@ -25,13 +24,15 @@ const MENU_ITEMS = [
 
 export default function HomeScreen() {
   const navigation = useNavigation<NavProp>();
+  const { userId } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!userId) return;
     usersService
-      .getById(HARDCODED_USER_ID)
+      .getById(userId)
       .then(setUser)
       .catch(() => setError("No se pudo conectar con el servidor"))
       .finally(() => setLoading(false));
