@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -22,6 +23,25 @@ export default function RoutinesScreen() {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+
+  function deleteRoutine(routine: Routine) {
+    Alert.alert(
+      "Eliminar rutina",
+      `¿Eliminar "${routine.name}"? Esta acción no se puede deshacer.`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () =>
+            routinesService
+              .remove(routine.id)
+              .then(() => setRoutines((prev) => prev.filter((r) => r.id !== routine.id)))
+              .catch(() => Alert.alert("Error", "No se pudo eliminar la rutina.")),
+        },
+      ]
+    );
+  }
 
   const fetchRoutines = useCallback(() => {
     setLoading(true);
@@ -55,6 +75,12 @@ export default function RoutinesScreen() {
               <View style={styles.cardRow}>
                 <Text style={styles.cardName}>{item.name}</Text>
                 {item.principal && <Text style={styles.badge}>Principal</Text>}
+                <TouchableOpacity
+                  onPress={() => deleteRoutine(item)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text style={styles.deleteBtn}>🗑</Text>
+                </TouchableOpacity>
               </View>
               {item.description && (
                 <Text style={styles.cardDesc}>{item.description}</Text>
@@ -102,6 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   cardDesc: { color: "#94a3b8", fontSize: 14 },
+  deleteBtn: { fontSize: 18, paddingLeft: 4 },
   fab: {
     position: "absolute",
     bottom: 28,

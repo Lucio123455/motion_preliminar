@@ -44,4 +44,5 @@ export const routinesService = {
     api.post<Day>(`/routines/${routineId}/days/`, data),
   addExercise: (routineId: number, dayId: number, data: { exercise_id: number; sets: number; reps: number; exercise_order: number }) =>
     api.post(`/routines/${routineId}/days/${dayId}/exercises`, data),
+  remove: (routineId: number) => api.del(`/routines/${routineId}`),
 };

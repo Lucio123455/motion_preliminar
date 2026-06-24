@@ -25,6 +25,14 @@ def list_progress(
     return crud.list_progress(db, user_id, exercise_id, from_date, to_date)
 
 
+@router.get("/last", response_model=ProgressResponse)
+def get_last_weight(user_id: int, exercise_id: int, db: Session = Depends(get_db)):
+    entry = crud.get_last_weight(db, user_id, exercise_id)
+    if not entry:
+        raise HTTPException(status_code=404, detail="Sin registros previos")
+    return entry
+
+
 @router.get("/{progress_id}", response_model=ProgressResponse)
 def get_progress(progress_id: int, db: Session = Depends(get_db)):
     entry = crud.get_progress(db, progress_id)

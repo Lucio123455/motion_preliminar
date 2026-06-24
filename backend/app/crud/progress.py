@@ -45,6 +45,15 @@ def update_progress(db: Session, progress_id: int, data: ProgressUpdate) -> Opti
     return entry
 
 
+def get_last_weight(db: Session, user_id: int, exercise_id: int) -> Optional[Progress]:
+    return (
+        db.query(Progress)
+        .filter(Progress.user_id == user_id, Progress.exercise_id == exercise_id, Progress.set_number == 1)
+        .order_by(Progress.date.desc())
+        .first()
+    )
+
+
 def delete_progress(db: Session, progress_id: int) -> bool:
     entry = db.get(Progress, progress_id)
     if not entry:
