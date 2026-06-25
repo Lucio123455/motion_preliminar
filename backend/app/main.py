@@ -15,7 +15,31 @@ app.include_router(body_measurements.router)
 
 @app.on_event("startup")
 def create_tables():
+    from app.database import SessionLocal
+    from app.models.exercise import Exercise
+
     Base.metadata.create_all(bind=engine)
+
+    EXERCISES = [
+        ("Press de banca", "Pecho"),
+        ("Sentadilla", "Piernas"),
+        ("Peso muerto", "Espalda baja"),
+        ("Dominadas", "Espalda"),
+        ("Press militar", "Hombros"),
+        ("Remo con barra", "Espalda"),
+        ("Curl de bíceps", "Bíceps"),
+        ("Extensión de tríceps", "Tríceps"),
+        ("Zancadas", "Piernas"),
+        ("Plancha", "Core"),
+    ]
+    db = SessionLocal()
+    try:
+        if db.query(Exercise).count() == 0:
+            for name, muscle in EXERCISES:
+                db.add(Exercise(name=name, muscle_group=muscle))
+            db.commit()
+    finally:
+        db.close()
 
 
 @app.get("/health")
